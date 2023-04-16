@@ -14,5 +14,3 @@ __LivCore - это многофункциональное серверное п�
 - [ ] Minecraft Bedrock Edition
 - [ ] Minecraft
 ------
-# Ссылка на оригинальное ядро
-__https://github.com/LiteCoreTeam/LiteCore-public__
