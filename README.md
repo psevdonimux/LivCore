@@ -13,4 +13,3 @@ __LivCore - это многофункциональное серверное п�
 - [X] Minecraft Pocket Edition v1.1.5
 - [ ] Minecraft Bedrock Edition
 - [ ] Minecraft
-------
