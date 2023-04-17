@@ -1,5 +1,5 @@
 #!/bin/sh
-apt install tar unzip wget
+apt install tar unzip wget git
 name="LivCore"
 git clone https://github.com/psevdonimux/$name.git
 wget https://github.com/pmmp/PHP-Binaries/releases/download/php-8.0-latest/PHP-Linux-x86_64-PM4.tar.gz
