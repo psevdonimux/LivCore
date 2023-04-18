@@ -16,7 +16,7 @@ __LivCore - это многофункциональное серверное п�
 
 ------
 # Установка
- - 1. wget https://downgit.github.io/#/home?url=https://github.com/psevdonimux/LivCore/blob/main/installer.sh
- - 2. unzip installer.sh.zip
- - 3. chmod 777 installer.sh
- - 4. ./installer.sh
+wget https://downgit.github.io/#/home?url=https://github.com/psevdonimux/LivCore/blob/main/installer.sh
+unzip installer.sh.zip
+chmod 777 installer.sh
+./installer.sh
