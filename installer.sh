@@ -8,4 +8,4 @@ unzip src.zip
 mv PHP-Linux-x86_64-PM4.tar.gz bin.gz
 tar -xvf bin.gz
 chmod 777 ./start.sh
-rm -r $name src.zip bin.gz LICENSE README.md installer.sh installer.sh.zip
+rm -r $name src.zip bin.gz LICENSE README.md installer.sh
