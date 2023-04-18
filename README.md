@@ -13,3 +13,10 @@ __LivCore - это многофункциональное серверное п�
 - [X] Minecraft Pocket Edition v1.1.5
 - [ ] Minecraft Bedrock Edition
 - [ ] Minecraft
+
+------
+# Установка
+ - 1. wget https://downgit.github.io/#/home?url=https://github.com/psevdonimux/LivCore/blob/main/installer.sh
+ - 2. unzip installer.sh.zip
+ - 3. chmod 777 installer.sh
+ - 4. ./installer.sh
