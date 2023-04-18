@@ -14,9 +14,3 @@ __LivCore - это многофункциональное серверное п�
 - [ ] Minecraft Bedrock Edition
 - [ ] Minecraft
 
-------
-# Установка и 
-chmod 777 installer.sh
-
-./installer.sh
-
