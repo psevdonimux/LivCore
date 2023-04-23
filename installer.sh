@@ -7,4 +7,4 @@ wget https://github.com/pmmp/PHP-Binaries/releases/download/php-8.0-latest/$name
 mv $name/* $PWD
 tar -xvf $name2
 chmod 777 ./start.sh
-rm -r $name src.zip $name2 LICENSE README.md installer.sh
+rm -r $name $name2 LICENSE README.md installer.sh
