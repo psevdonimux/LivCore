@@ -7,7 +7,7 @@ use pocketmine\command\{Command, CommandSender};
 use pocketmine\entity\{Animal, Arrow, Attribute, Boat, Effect, Entity, FishingHook, Human, Item as DroppedItem, Living, Minecart, Projectile};
 use pocketmine\event\block\ItemFrameDropItemEvent;
 use pocketmine\event\entity\{EntityCombustByEntityEvent, EntityDamageByBlockEvent, EntityDamageByEntityEvent, EntityDamageEvent, EntityShootBowEvent, ProjectileLaunchEvent};
-use pocketmine\network\mcpe\protocol\{CommandStepPacket, LevelSoundEventPacket};
+use pocketmine\network\mcpe\protocol\{CommandStepPacket, LevelSoundEventPacket, AdventureSettingsPacket, AnimatePacket, AvailableCommandsPacket, BatchPacket, ChangeDimensionPacket, ChunkRadiusUpdatedPacket, ContainerSetContentPacket, ContainerSetSlotPacket, DataPacket, DisconnectPacket, EntityEventPacket, InteractPacket, LevelEventPacket, MobEquipmentPacket, MovePlayerPacket, PlayerActionPacket, PlayStatusPacket, ProtocolInfo, ResourcePackChunkDataPacket, ResourcePackClientResponsePacket, ResourcePackDataInfoPacket, ResourcePacksInfoPacket, ResourcePackStackPacket, RespawnPacket, SetEntityMotionPacket, SetPlayerGameTypePacket, SetSpawnPositionPacket, SetTitlePacket, StartGamePacket, TakeItemEntityPacket, TextPacket, TransferPacket, UpdateAttributesPacket, UpdateBlockPacket, SetEntityLinkPacket, AddEntityPacket};
 use pocketmine\event\inventory\{CraftItemEvent, InventoryCloseEvent, InventoryPickupArrowEvent, InventoryPickupItemEvent};
 use pocketmine\event\player\cheat\PlayerIllegalMoveEvent;
 use pocketmine\event\player\{PlayerAchievementAwardedEvent, PlayerAnimationEvent, PlayerBedEnterEvent, PlayerBedLeaveEvent, PlayerChatEvent, PlayerCommandPreprocessEvent, PlayerDeathEvent, PlayerDropItemEvent, PlayerExhaustEvent, PlayerGameModeChangeEvent, PlayerInteractEvent, PlayerItemConsumeEvent, PlayerJoinEvent, PlayerJumpEvent, PlayerKickEvent, PlayerLoginEvent, PlayerMoveEvent, PlayerPreLoginEvent, PlayerQuitEvent, PlayerRespawnEvent, PlayerTextPreSendEvent, PlayerToggleFlightEvent, PlayerToggleGlideEvent, PlayerToggleSneakEvent, PlayerToggleSprintEvent, PlayerTransferEvent, PlayerUseFishingRodEvent};
@@ -23,7 +23,6 @@ use pocketmine\math\{AxisAlignedBB, Vector3};
 use pocketmine\metadata\MetadataValue;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\{ByteTag, CompoundTag, DoubleTag, FloatTag, IntTag, ListTag, LongTag, ShortTag, StringTag};
-use pocketmine\network\mcpe\protocol\{AdventureSettingsPacket, AnimatePacket, AvailableCommandsPacket, BatchPacket, ChangeDimensionPacket, ChunkRadiusUpdatedPacket, ContainerSetContentPacket, ContainerSetSlotPacket, DataPacket, DisconnectPacket, EntityEventPacket, InteractPacket, LevelEventPacket, MobEquipmentPacket, MovePlayerPacket, PlayerActionPacket, PlayStatusPacket, ProtocolInfo, ResourcePackChunkDataPacket, ResourcePackClientResponsePacket, ResourcePackDataInfoPacket, ResourcePacksInfoPacket, ResourcePackStackPacket, RespawnPacket, SetEntityMotionPacket, SetPlayerGameTypePacket, SetSpawnPositionPacket, SetTitlePacket, StartGamePacket, TakeItemEntityPacket, TextPacket, TransferPacket, UpdateAttributesPacket, UpdateBlockPacket};
 use pocketmine\network\SourceInterface;
 use pocketmine\permission\{PermissibleBase, PermissionAttachment, Permission};
 use pocketmine\plugin\Plugin;
@@ -3196,5 +3195,23 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
  }
  public function getXuid() : mixed{
   return $this->xbox;
+ }
+ //new method 
+ public function setSit(bool $value) : void{
+   $add = new AddEntityPacket;
+   $add->eid = 100;
+   $add->type = DroppedItem::NETWORK_ID;
+   $add->x = $this->getX();
+   $add->y = $this->getY() + 0.9;
+   $add->z = $this->getZ();
+   $add->metadata = [
+   Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, 1 << Entity::DATA_FLAG_IMMOBILE | 1 << Entity::DATA_FLAG_INVISIBLE]
+   ];
+   $this->server->broadcastPacket($this->level->getPlayers(), $add);
+   $link = new SetEntityLinkPacket;
+   $link->from = 100;
+   $link->to = $this->getId();
+   $link->type = $value ? 1 : 0;
+   $this->server->broadcastPacket($this->level->getPlayers(), $link);
  }
 }
