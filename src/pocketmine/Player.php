@@ -50,7 +50,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  protected array $windows = [], $windowIndex = [], $loadQueue = [], $hiddenPlayers = [], $personalCreativeItems = [];
  public array $achievements = [], $selectedPos = [], $selectedLev = [], $usedChunks = [], $weatherData = [0, 0, 0];
  public int $foodTick = 0, $starvationTick = 0, $foodUsageTime = 0, $gamemode, $craftingType = self::CRAFTING_SMALL;
- protected bool $connected = true, $removeFormat = false, $isTeleporting = false, $autoJump = true, $allowFlight = false, $flying = false, $allowMovementCheats = false, $shouldSendStatus = false, $moving = false;
+ protected bool $connected = true, $removeFormat = false, $isTeleporting = false, $autoJump = true, $allowFlight = false, $flying = false, $allowMovementCheats = false, $shouldSendStatus = false, $moving = false, $isSit = false;
  protected string $username, $iusername, $displayName, $languageCode = 'en_UK', $ip;
  protected ?Vector3 $sleeping = null;
  private ?int $loaderId = null;
@@ -451,7 +451,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  protected function sendNextChunk() : void{
   if(!$this->isConnected()){
    return;
-  } 
+  }
   Timings::$playerChunkSendTimer->startTiming();
   $count = 0;
   foreach($this->loadQueue as $index => $distance){
@@ -1884,6 +1884,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
       $this->respawn();
       break;
      case PlayerActionPacket::ACTION_JUMP:
+      if($this->isSit()){
+       $this->setSit(false);
+      }
       $this->jump();
       break 2;
      case PlayerActionPacket::ACTION_START_SPRINT:
@@ -3197,6 +3200,9 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
   return $this->xbox;
  }
  //new method 
+ public function isSit() : bool{
+  return $this->isSit;
+ }
  public function setSit(bool $value) : void{
    $add = new AddEntityPacket;
    $add->eid = 100;
@@ -3212,6 +3218,7 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
    $link->from = 100;
    $link->to = $this->getId();
    $link->type = $value ? 1 : 0;
+   $this->isSit = $value ? true : false;
    $this->server->broadcastPacket($this->level->getPlayers(), $link);
  }
 }
