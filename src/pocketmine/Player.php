@@ -451,7 +451,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  protected function sendNextChunk() : void{
   if(!$this->isConnected()){
    return;
-  }
+  } 
   Timings::$playerChunkSendTimer->startTiming();
   $count = 0;
   foreach($this->loadQueue as $index => $distance){
