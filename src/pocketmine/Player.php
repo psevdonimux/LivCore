@@ -3211,7 +3211,7 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
    $add->y = $this->getY() + 0.9;
    $add->z = $this->getZ();
    $add->metadata = [
-   Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, 1 << Entity::DATA_FLAG_IMMOBILE | 1 << Entity::DATA_FLAG_INVISIBLE]
+   Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, 1 << Entity::DATA_FLAG_IMMOBILE]
    ];
    $this->server->broadcastPacket($this->level->getPlayers(), $add);
    $link = new SetEntityLinkPacket;
