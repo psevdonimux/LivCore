@@ -1787,7 +1787,6 @@ $this->chunks[$index] = $chunk;
 unset($this->blockCache[$index]);
 $chunk->initChunk($this);
 $this->server->getPluginManager()->callEvent(new ChunkLoadEvent($this, $chunk, !$chunk->isGenerated()));
-$this->getServer()->getScheduler()->scheduleAsyncTask(new LightPopulationTask($this, $chunk));
 if ($this->isChunkInUse($x, $z)) {
 foreach ($this->getChunkLoaders($x, $z) as $loader) {
 $loader->onChunkLoaded($chunk);
