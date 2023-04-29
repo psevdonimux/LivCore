@@ -22,5 +22,6 @@ original core: LiteCore-public v1.0.5
  - pocketmine\entity\Human.php
  - pocketmine\OfflinePlayer.php 
  - pocketmine\level\Level.php
+ - pocketmine\level\format\Chunk.php 
 2. исправленные баги:
  - при зажатий курсора на существе можно было ударить его 1 раз без рук, это исправлено
