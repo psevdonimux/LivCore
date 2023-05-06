@@ -291,12 +291,6 @@ class Chunk{
         return $this->tiles;
    }
     public function onUnload() : void{
-        foreach($this->getEntities() as $entity){
-            if($entity instanceof Player){
-                continue;
-            }
-            $entity->close();
-        }
         foreach($this->getTiles() as $tile){
             $tile->close();
         }
@@ -304,17 +298,6 @@ class Chunk{
     public function getTile(int $x, int $y, int $z) : ?Tile{
         $index = ($x << 12) | ($z << 8) | $y;
         return $this->tileList[$index] ?? null;
-    }
-    public function unload() : void{
-        foreach($this->getEntities() as $entity){
-            if($entity instanceof Player){
-                continue;
-            }
-            $entity->close();
-        }
-        foreach($this->getTiles() as $tile){
-            $tile->close();
-        }
     }
     public function initChunk(Level $level) : void{
         if(!$this->isInit){
