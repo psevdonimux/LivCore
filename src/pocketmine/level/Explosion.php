@@ -141,11 +141,8 @@ class Explosion{
 							if($blockId !== 0){
 								$blastForce -= (Block::$blastResistance[$blockId] / 5 + 0.3) * $this->stepLen;
 								if($blastForce > 0){
-									if(!isset($this->affectedBlocks[Level::blockHash($vBlock->x, $vBlock->y, $vBlock->z)])){
-										$_block = Block::get($blockId, $this->subChunkHandler->currentSubChunk->getBlockData($vBlock->x & 0x0f, $vBlock->y & 0x0f, $vBlock->z & 0x0f), $vBlock);
-										foreach($_block->getAffectedBlocks() as $_affectedBlock){
-											$this->affectedBlocks[Level::blockHash($_affectedBlock->x, $_affectedBlock->y, $_affectedBlock->z)] = $_affectedBlock;
-										}
+									if(!isset($this->affectedBlocks[$index = Level::blockHash($vBlock->x, $vBlock->y, $vBlock->z)])){
+											$this->affectedBlocks[$index] = Block::get($blockId, $this->subChunkHandler->currentSubChunk->getBlockData($vBlock->x & 0x0f, $vBlock->y & 0x0f, $vBlock->z & 0x0f), $vBlock);
 									}
 								}
 							}
