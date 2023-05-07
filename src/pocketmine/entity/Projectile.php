@@ -238,9 +238,6 @@ abstract class Projectile extends Entity{
 					return false;
 				}
 			}
-
-			$this->move($this->motionX, $this->motionY, $this->motionZ);
-
 			if($this->isCollided and !$this->hadCollision){ //Collided with a block
 				$this->hadCollision = true;
 
@@ -255,15 +252,16 @@ abstract class Projectile extends Entity{
 				//TODO: fix this
 				$this->hadCollision = false;
 			}
-
 			if(!$this->hadCollision or abs($this->motionX) > 0.00001 or abs($this->motionY) > 0.00001 or abs($this->motionZ) > 0.00001){
 				$f = sqrt(($this->motionX ** 2) + ($this->motionZ ** 2));
 				$this->yaw = (atan2($this->motionX, $this->motionZ) * 180 / M_PI);
 				$this->pitch = (atan2($this->motionY, $f) * 180 / M_PI);
 				$hasUpdate = true;
 			}
-
-			$this->updateMovement();
+            if(!$this->isCollided){
+             $this->move($this->motionX, $this->motionY, $this->motionZ);
+			 $this->updateMovement();
+           }
 		}
 
 		return $hasUpdate;
