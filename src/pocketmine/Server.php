@@ -33,7 +33,7 @@ use pocketmine\network\upnp\UPnP;
 use pocketmine\permission\{BanList, DefaultPermissions};
 use pocketmine\plugin\{PharPluginLoader, FolderPluginLoader, Plugin, PluginLoadOrder, PluginManager, ScriptPluginLoader};
 use pocketmine\resourcepacks\ResourcePackManager;
-use pocketmine\scheduler\{CallbackTask, DServerTask, FileWriteTask, SendUsageTask, ServerScheduler};
+use pocketmine\scheduler\{CallbackTask, DServerTask, FileWriteTask, ServerScheduler};
 use pocketmine\snooze\{SleeperHandler, SleeperNotifier};
 use pocketmine\tile\Tile;
 use pocketmine\utils\{Binary, Color, Config, MainLogger, ServerException, Terminal, TextFormat, Utils, UUID, VersionString};
@@ -51,8 +51,8 @@ class Server{
  private ?PluginManager $pluginManager = null;
  private float $profilingTickRate = 20, $nextTick = 0, $currentUse = 0, $currentTPS = 20;
  private ?ServerScheduler $scheduler = null;
- private int $tickCounter = 0, $sendUsageTicker = 0, $maxPlayers, $autoSaveTicker = 0, $autoSaveTicks = 6000;
- private array $tickAverage = [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20], $useAverage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $expCache, $uniquePlayers = [], $propertyCache = [], $players = [], $playerList = [], $levels = [];
+ private int $tickCounter = 0, $maxPlayers, $autoSaveTicker = 0, $autoSaveTicks = 6000;
+ private array $tickAverage = [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20], $useAverage = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $expCache, $propertyCache = [], $players = [], $playerList = [], $levels = [];
  private \ThreadedLogger $logger;
  private MemoryManager $memoryManager;
  private ?CommandReader $console = null;
@@ -1331,9 +1331,6 @@ class Server{
    return;
   }
    try{
-  if(!$this->isRunning()){
-   $this->sendUsage(SendUsageTask::TYPE_CLOSE);
-  }
   $this->hasStopped = true;
   $this->shutdown();
   if($this->rcon instanceof RCON){
@@ -1393,10 +1390,6 @@ class Server{
   }
   foreach($this->getIPBans()->getEntries() as $entry){
    $this->network->blockAddress($entry->getName(), -1);
-  }
-  if($this->getProperty('settings.send-usage', true)){
-   $this->sendUsageTicker = 6000;
-   $this->sendUsage(SendUsageTask::TYPE_OPEN);
   }
    if($this->getProperty('network.upnp-forwarding', false)){
   $this->logger->info('[UPnP] Trying to port forward...');
@@ -1458,9 +1451,6 @@ class Server{
    while(@ob_end_flush()){}
   if(!$this->isRunning){
    return;
-  }
-  if($this->sendUsageTicker > 0){
-   $this->sendUsage(SendUsageTask::TYPE_CLOSE);
   }
   $this->hasStopped = false;
   ini_set("error_reporting", '0');
@@ -1538,9 +1528,6 @@ class Server{
   }
  }
  public function onPlayerLogin(Player $player) : void{
-  if($this->sendUsageTicker > 0){
-   $this->uniquePlayers[$player->getRawUniqueId()] = $player->getRawUniqueId();
-  }
   $this->sendFullPlayerListData($player);
   $player->dataPacket($this->craftingManager->getCraftingDataPacket());
  }
@@ -1623,10 +1610,6 @@ class Server{
   }
   Timings::$worldSaveTimer->stopTiming();
     }
- }
- public function sendUsage($type = SendUsageTask::TYPE_STATUS) : void{
-  $this->scheduler->scheduleAsyncTask(new SendUsageTask($this, $type, $this->uniquePlayers));
-  $this->uniquePlayers = [];
  }
  public function getLanguage(){
   return $this->baseLang;
