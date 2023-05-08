@@ -33,7 +33,7 @@ use pocketmine\network\upnp\UPnP;
 use pocketmine\permission\{BanList, DefaultPermissions};
 use pocketmine\plugin\{PharPluginLoader, FolderPluginLoader, Plugin, PluginLoadOrder, PluginManager, ScriptPluginLoader};
 use pocketmine\resourcepacks\ResourcePackManager;
-use pocketmine\scheduler\{CallbackTask, DServerTask, FileWriteTask, ServerScheduler};
+use pocketmine\scheduler\{FileWriteTask, ServerScheduler};
 use pocketmine\snooze\{SleeperHandler, SleeperNotifier};
 use pocketmine\tile\Tile;
 use pocketmine\utils\{Binary, Color, Config, MainLogger, ServerException, Terminal, TextFormat, Utils, UUID, VersionString};
@@ -74,12 +74,11 @@ class Server{
  private Config $properties, $config;
  private ?Level $levelDefault = null;
  private SleeperHandler $tickSleeper;
- public int $networkCompressionLevel = 7, $weatherRandomDurationMin = 6000, $weatherRandomDurationMax = 12000, $lightningTime = 200, $dserverPlayers = 0, $dserverAllPlayers = 0, $pulseFrequency = 20, $chunkRadius = -1;
+ public int $networkCompressionLevel = 7, $weatherRandomDurationMin = 6000, $weatherRandomDurationMax = 12000, $lightningTime = 200, $pulseFrequency = 20, $chunkRadius = -1;
  public ?Config $advancedConfig = null;
  public bool $weatherEnabled = true, $netherEnabled = false, $lightningFire = false, $redstoneEnabled = false, $allowFrequencyPulse = true, $anvilEnabled = false, $keepExperience = false, $destroyBlockParticle = true, $allowSplashPotion = true, $fireSpread = false, $advancedCommandSelector = false, $enchantingTableEnabled = true, $countBookshelf = false, $allowInventoryCheats = false, $folderpluginloader = true, $loadIncompatibleAPI = true, $enderEnabled = true, $absorbWater = false, $allowSnowGolem, $allowIronGolem;
  public ?Level $netherLevel = null, $enderLevel = null; 
  public VersionString $version;
- public array $dserverConfig = [];
 
  public function getName() : string{
   return 'LivCore-public v1.0.0-beta';
@@ -105,40 +104,40 @@ class Server{
    ($minutes != 0 ? $minutes. ' '. $lang('%pocketmine.command.status.minutes'). ' ' : '').
    ($seconds != 0 ? $seconds. ' '. $lang('%pocketmine.command.status.seconds') : '');
  }
- public function getPocketMineVersion(){
+ public function getPocketMineVersion() : string{
   return \pocketmine\VERSION;
  }
- public function getFormattedVersion($prefix = ''){
+ public function getFormattedVersion($prefix = '') : string{
   return (\pocketmine\VERSION !== '' ? $prefix . \pocketmine\VERSION : '');
  }
- public function getGitCommit(){
+ public function getGitCommit() : string{
   return \pocketmine\GIT_COMMIT;
  }
- public function getShortGitCommit(){
+ public function getShortGitCommit() : string{
   return substr(\pocketmine\GIT_COMMIT, 0, 7);
  }
- public function getCodename(){
+ public function getCodename() : string{
   return \pocketmine\CODENAME;
  }
- public function getVersion(){
+ public function getVersion() : string{
   return implode(',', ProtocolInfo::MINECRAFT_VERSION);
  }
- public function getApiVersion(){
+ public function getApiVersion() : string{
   return \pocketmine\API_VERSION;
  }
- public function getGeniApiVersion(){
+ public function getGeniApiVersion() : string{
   return \pocketmine\GENISYS_API_VERSION;
  }
- public function getFilePath(){
+ public function getFilePath() : string{
   return \pocketmine\PATH;
  }
  public function getResourcePath() : string{
   return \pocketmine\RESOURCE_PATH;
  }
- public function getDataPath(){
+ public function getDataPath() : string{
   return $this->dataPath;
  }
- public function getPluginPath(){
+ public function getPluginPath() : string{
   return $this->pluginPath;
  }
  public function getMaxPlayers() : int{
@@ -157,14 +156,14 @@ class Server{
   $str = $this->getConfigString('server-ip');
   return $str !== '' ? $str : '0.0.0.0';
  }
- public function getServerUniqueId(){
+ public function getServerUniqueId() : UUID{
   return $this->serverID;
  }
- public function getAutoSave(){
+ public function getAutoSave() : bool{
   return $this->autoSave;
  }
- public function setAutoSave($value) : void{
-  $this->autoSave = (bool) $value;
+ public function setAutoSave(bool $value) : void{
+  $this->autoSave = $value;
   foreach($this->getLevels() as $level){
    $level->setAutoSave($this->autoSave);
   }
@@ -208,7 +207,7 @@ class Server{
   throw new \InvalidArgumentException("Invalid gamemode $mode");
   }
  }
- public static function getGamemodeFromString(string $str){
+ public static function getGamemodeFromString(string $str) : int{
   switch(strtolower(trim($str))){
   case Player::SURVIVAL:
   case 'survival':
@@ -230,7 +229,7 @@ class Server{
   }
   return -1;
  }
- public static function getDifficultyFromString($str){
+ public static function getDifficultyFromString(string $str) : int{
   switch(strtolower(trim($str))){
   case '0':
   case 'peaceful':
@@ -251,46 +250,46 @@ class Server{
   }
   return -1;
  }
- public function getDifficulty(){
+ public function getDifficulty() : int{
   return $this->getConfigInt('difficulty', 1);
  }
  public function hasWhitelist() : bool{
   return $this->getConfigBoolean('white-list', false);
  }
- public function getSpawnRadius(){
+ public function getSpawnRadius() : int{
   return $this->getConfigInt('spawn-protection', 16);
  }
  public function getAllowFlight() : bool{
   return true;
  }
- public function isHardcore(){
+ public function isHardcore() : bool{
   return $this->getConfigBoolean('hardcore', false);
  }
- public function getDefaultGamemode(){
+ public function getDefaultGamemode() : int{
   return $this->getConfigInt('gamemode', 0) & 0b11;
  }
  public function getMotd() : string{
   return $this->getConfigString('motd', 'Minecraft: PE Server');
  }
- public function getLoader(){
+ public function getLoader() : \ClassLoader{
   return $this->autoloader;
  }
- public function getLogger(){
+ public function getLogger() : \ThreadedLogger{
   return $this->logger;
  }
- public function getEntityMetadata(){
+ public function getEntityMetadata() : EntityMetadataStore{
   return $this->entityMetadata;
  }
- public function getPlayerMetadata(){
+ public function getPlayerMetadata() : PlayerMetadataStore{
   return $this->playerMetadata;
  }
- public function getLevelMetadata(){
+ public function getLevelMetadata() : LevelMetadataStore{
   return $this->levelMetadata;
  }
- public function getPluginManager(){
+ public function getPluginManager() : ?PluginManager{
   return $this->pluginManager;
  }
- public function getCraftingManager(){
+ public function getCraftingManager() : CraftingManager{
   return $this->craftingManager;
  }
  public function getResourceManager() : ResourcePackManager{
@@ -443,7 +442,7 @@ class Server{
    }
   return null;
  }
- public function matchPlayer($partialName){
+ public function matchPlayer($partialName) : array{
   $partialName = strtolower($partialName);
   $matchedPlayers = [];
    foreach($this->getOnlinePlayers() as $player){
@@ -466,10 +465,10 @@ class Server{
  public function removePlayer(Player $player) : void{
   unset($this->players[spl_object_hash($player)]);
  }
- public function getLevels(){
+ public function getLevels() : array{
   return $this->levels;
  }
- public function getDefaultLevel(){
+ public function getDefaultLevel() : ?Level{
   return $this->levelDefault;
  }
  public function setDefaultLevel(?Level $level) : void{
@@ -477,13 +476,13 @@ class Server{
    $this->levelDefault = $level;
   }
  }
- public function isLevelLoaded($name) : bool{
+ public function isLevelLoaded(string $name) : bool{
   return $this->getLevelByName($name) instanceof Level;
  }
- public function getLevel($levelId){
+ public function getLevel(int $levelId) : ?Level{
   return $this->levels[$levelId] ?? null;
  }
- public function getLevelByName($name){
+ public function getLevelByName($name) : ?Level{
    foreach($this->getLevels() as $level){
   if($level->getFolderName() === $name){
    return $level;
@@ -491,7 +490,7 @@ class Server{
    }
   return null;
  }
- public function getExpectedExperience($level){
+ public function getExpectedExperience(Level $level) : bool{
   if(isset($this->expCache[$level])) return $this->expCache[$level];
   $levelSquared = $level ** 2;
   if($level < 16) $this->expCache[$level] = $levelSquared + 6 * $level;
@@ -499,7 +498,7 @@ class Server{
   else $this->expCache[$level] = 4.5 * $levelSquared - 162.5 * $level + 2220;
   return $this->expCache[$level];
  }
- public function unloadLevel(Level $level, $forceUnload = false){
+ public function unloadLevel(Level $level, $forceUnload = false) : bool{
   if($level === $this->getDefaultLevel() and !$forceUnload){
    throw new \InvalidStateException("The default world cannot be unloaded while running, please switch worlds.");
   } 
@@ -508,7 +507,7 @@ class Server{
  public function removeLevel(Level $level) : void{
   unset($this->levels[$level->getId()]);
  }
- public function loadLevel($name){
+ public function loadLevel(string $name) : bool{
   if(trim($name) === ''){
    throw new LevelException("Invalid empty level name");
   }
@@ -540,7 +539,7 @@ class Server{
   $this->getPluginManager()->callEvent(new LevelLoadEvent($level));
   return true;
  }
- public function generateLevel($name, $seed = null, $generator = null, $options = []){
+ public function generateLevel(string $name, string $seed = null, $generator = null, array $options = []) : bool{
   if(trim($name) === "" or $this->isLevelGenerated($name)){
    return false;
   }
@@ -594,7 +593,7 @@ class Server{
   }
   return true;
  }
- public function isLevelGenerated($name){
+ public function isLevelGenerated(string $name) : bool{
   if(trim($name) === ""){
    return false;
   }
@@ -606,7 +605,7 @@ class Server{
   }
   return true;
  }
- public function findEntity(int $entityId, Level $expectedLevel = null){
+ public function findEntity(int $entityId, Level $expectedLevel = null) : ?Entity{
    foreach($this->levels as $level){
   assert(!$level->isClosed());
   if(($entity = $level->getEntity($entityId)) instanceof Entity){
@@ -615,14 +614,14 @@ class Server{
    }
   return null;
  }
- public function getConfigString($variable, $defaultValue = ""){
+ public function getConfigString($variable, $defaultValue = "") : string{
   $v = getopt("", ["$variable::"]);
   if(isset($v[$variable])){
    return (string) $v[$variable];
   }
   return $this->properties->exists($variable) ? $this->properties->get($variable) : $defaultValue;
  }
- public function getProperty($variable, $defaultValue = null){
+ public function getProperty($variable, $defaultValue = null) : mixed{
    if(!array_key_exists($variable, $this->propertyCache)){
    $v = getopt("", ["$variable::"]);
   if(isset($v[$variable])){
@@ -634,20 +633,20 @@ class Server{
    }
   return $this->propertyCache[$variable] === null ? $defaultValue : $this->propertyCache[$variable];
  }
- public function setConfigString($variable, $value){
+ public function setConfigString($variable, $value) : void{
   $this->properties->set($variable, $value);
  }
- public function getConfigInt($variable, $defaultValue = 0){
+ public function getConfigInt($variable, $defaultValue = 0) : int{
   $v = getopt("", ["$variable::"]);
   if(isset($v[$variable])){
    return (int) $v[$variable];
   }
   return $this->properties->exists($variable) ? (int) $this->properties->get($variable) : (int) $defaultValue;
  }
- public function setConfigInt($variable, $value){
+ public function setConfigInt($variable, $value) : void{
   $this->properties->set($variable, (int) $value);
  }
- public function getConfigBoolean($variable, $defaultValue = false){
+ public function getConfigBoolean($variable, $defaultValue = false) : bool{
   $v = getopt("", ["$variable::"]);
   if(isset($v[$variable])){
    $value = $v[$variable];
@@ -667,10 +666,10 @@ class Server{
   }
   return false;
  }
- public function setConfigBool($variable, $value){
+ public function setConfigBool($variable, $value) : void{
   $this->properties->set($variable, $value ? "1" : "0");
  }
- public function getPluginCommand($name){
+ public function getPluginCommand(string $name) : ?Command{
   if(($command = $this->commandMap->getCommand($name)) instanceof PluginIdentifiableCommand){
    return $command;
   }
@@ -678,23 +677,23 @@ class Server{
    return null;
   }
  }
- public function getNameBans(){
+ public function getNameBans() : ?BanList{
   return $this->banByName;
  }
- public function getIPBans(){
+ public function getIPBans() : ?BanList{
   return $this->banByIP;
  }
- public function getCIDBans(){
+ public function getCIDBans() : ?BanList{
   return $this->banByCID;
  }
- public function addOp($name) : void{
+ public function addOp(string $name) : void{
   $this->operators->set(strtolower($name), true);
   if(($player = $this->getPlayerExact($name)) !== null){
    $player->recalculatePermissions();
   }
   $this->operators->save();
  }
- public function removeOp($name) : void{
+ public function removeOp(string $name) : void{
    foreach($this->operators->getAll() as $opName => $dummyValue){
   if(strtolower($name) === strtolower($opName)){
    $this->operators->remove($opName);
@@ -705,30 +704,30 @@ class Server{
   }
   $this->operators->save();
  }
- public function addWhitelist($name) : void{
+ public function addWhitelist(string $name) : void{
   $this->whitelist->set(strtolower($name), true);
   $this->whitelist->save();
  }
- public function removeWhitelist($name) : void{
+ public function removeWhitelist(string $name) : void{
   $this->whitelist->remove(strtolower($name));
   $this->whitelist->save();
  }
- public function isWhitelisted($name) : bool{
+ public function isWhitelisted(string $name) : bool{
   return !$this->hasWhitelist() or $this->whitelist->exists($name, true);
  }
- public function isOp($name) : bool{
+ public function isOp(string $name) : bool{
   return $this->operators->exists($name, true);
  }
- public function getWhitelisted(){
+ public function getWhitelisted() : array{
   return $this->whitelist;
  }
- public function getOps(){
+ public function getOps() : array{
   return $this->operators;
  }
- public function reloadWhitelist(){
+ public function reloadWhitelist() : void{
   $this->whitelist->reload();
  }
- public function getCommandAliases(){
+ public function getCommandAliases() : array{
   $section = $this->getProperty("aliases");
   $result = [];
     if(is_array($section)){
@@ -745,7 +744,7 @@ class Server{
     }
   return $result;
  }
- public function getCrashPath(){
+ public function getCrashPath() : string{
   return $this->dataPath . "crashdumps/";
  }
  public static function getInstance() : Server{
@@ -774,20 +773,6 @@ class Server{
   $this->lightningFire = $this->getAdvancedProperty("level.lightning-fire", false);
   $this->allowSnowGolem = $this->getAdvancedProperty("server.allow-snow-golem", false);
   $this->allowIronGolem = $this->getAdvancedProperty("server.allow-iron-golem", false);
-  $this->dserverConfig = [
-  "enable" => $this->getAdvancedProperty("dserver.enable", false),
-  "queryAutoUpdate" => $this->getAdvancedProperty("dserver.query-auto-update", false),
-  "queryTickUpdate" => $this->getAdvancedProperty("dserver.query-tick-update", true),
-  "motdMaxPlayers" => $this->getAdvancedProperty("dserver.motd-max-players", 0),
-  "queryMaxPlayers" => $this->getAdvancedProperty("dserver.query-max-players", 0),
-  "motdAllPlayers" => $this->getAdvancedProperty("dserver.motd-all-players", false),
-  "queryAllPlayers" => $this->getAdvancedProperty("dserver.query-all-players", false),
-  "motdPlayers" => $this->getAdvancedProperty("dserver.motd-players", false),
-  "queryPlayers" => $this->getAdvancedProperty("dserver.query-players", false),
-  "timer" => $this->getAdvancedProperty("dserver.time", 40),
-  "retryTimes" => $this->getAdvancedProperty("dserver.retry-times", 3),
-  "serverList" => explode(";", $this->getAdvancedProperty("dserver.server-list", ""))
-  ];
   $this->redstoneEnabled = $this->getAdvancedProperty("redstone.enable", false);
   $this->allowFrequencyPulse = $this->getAdvancedProperty("redstone.allow-frequency-pulse", false);
   $this->pulseFrequency = $this->getAdvancedProperty("redstone.pulse-frequency", 20);
@@ -804,22 +789,10 @@ class Server{
   $this->folderpluginloader = $this->getAdvancedProperty("developer.folder-plugin-loader", true);
   $this->absorbWater = $this->getAdvancedProperty("server.absorb-water", false);
  }
- public function getDServerMaxPlayers() : int{
-  return ($this->dserverAllPlayers + $this->getMaxPlayers());
- }
- public function getDServerOnlinePlayers() : int{
-  return ($this->dserverPlayers + count($this->getOnlinePlayers()));
- }
- public function isDServerEnabled() : bool{
-  return $this->dserverConfig['enable'];
- }
- public function updateDServerInfo() : void{
-  $this->scheduler->scheduleAsyncTask(new DServerTask($this->dserverConfig['serverList'], $this->dserverConfig['retryTimes']));
- }
- public function getBuild(){
+ public function getBuild() : int{
   return $this->version->getBuild();
  }
- public function getGameVersion(){
+ public function getGameVersion() : string{
   return $this->version->getRelease();
  }
  public function __construct(\ClassLoader $autoloader, \ThreadedLogger $logger, $dataPath, $pluginPath, $defaultLang = "unknown"){
@@ -1130,10 +1103,6 @@ class Server{
    $this->autoSaveTicks = (int) $this->getProperty("ticks-per.autosave", 6000);
   }
   $this->enablePlugins(PluginLoadOrder::POSTWORLD);
-   if($this->dserverConfig["enable"] and ($this->getAdvancedProperty("dserver.server-list", "") != "")) $this->scheduler->scheduleRepeatingTask(new CallbackTask([
-  $this,
-  "updateDServerInfo"
-  ]), $this->dserverConfig["timer"]);
   if($cfgVer > $advVer){
    $this->logger->notice("Your lite.yml needs update");
    $this->logger->notice("Current Version: $advVer   Latest Version: $cfgVer");
@@ -1181,7 +1150,7 @@ class Server{
   }
   return count($recipients);
  }
- public function broadcastTitle(string $title, string $subtitle = "", int $fadeIn = -1, int $stay = -1, int $fadeOut = -1, ?array $recipients = null){
+ public function broadcastTitle(string $title, string $subtitle = "", int $fadeIn = -1, int $stay = -1, int $fadeOut = -1, ?array $recipients = null) : int{
     if(!is_array($recipients)){
   $recipients = [];
    foreach($this->pluginManager->getPermissionSubscriptions(self::BROADCAST_CHANNEL_USERS) as $permissible){
@@ -1326,7 +1295,7 @@ class Server{
    $this->propertyCache["settings.shutdown-message"] = $msg;
   }
  }
- public function forceShutdown(){
+ public function forceShutdown() : void{
   if($this->hasStopped){
    return;
   }
@@ -1381,7 +1350,7 @@ class Server{
    @Utils::kill(getmypid());
   }
  }
- public function getQueryInformation(){
+ public function getQueryInformation() : ?QueryRegenerateEvent{
   return $this->queryRegenerateTask; 
  }
  public function start() : void{
@@ -1611,16 +1580,16 @@ class Server{
   Timings::$worldSaveTimer->stopTiming();
     }
  }
- public function getLanguage(){
+ public function getLanguage() : BaseLang{
   return $this->baseLang;
  }
- public function isLanguageForced(){
+ public function isLanguageForced() : bool{
   return $this->forceLanguage;
  }
  public function getNetwork() : Network{
   return $this->network;
  }
- public function getMemoryManager(){
+ public function getMemoryManager() : MemoryManager{
   return $this->memoryManager;
  }
  public function handlePacket(AdvancedSourceInterface $interface, string $address, int $port, string $payload) : void{
@@ -1641,7 +1610,7 @@ class Server{
    }
   Timings::$serverRawPacketTimer->stopTiming();
  }
- public function getAdvancedProperty($variable, $defaultValue = null, Config $cfg = null){
+ public function getAdvancedProperty($variable, $defaultValue = null, Config $cfg = null) : mixed{
   $vars = explode(".", $variable);
   $base = array_shift($vars);
   if($cfg == null) $cfg = $this->advancedConfig;
@@ -1685,14 +1654,9 @@ class Server{
    if(($this->tickCounter % 20) === 0){
   $this->currentTPS = 20;
   $this->currentUse = 0;
-  if(($this->dserverConfig['enable'] and $this->dserverConfig['queryTickUpdate']) or !$this->dserverConfig['enable']){
-   $this->updateQuery();
-  }
+  $this->updateQuery();
   $this->network->updateName();
   $this->network->resetStatistics();
-  if($this->dserverConfig['enable'] and $this->dserverConfig['motdPlayers']){
-   $this->network->setName($this->network->getName().'['.$this->getDServerOnlinePlayers().'/'.$this->getDServerMaxPlayers().']');
-  }
    }
   if($this->autoSave and ++$this->autoSaveTicker >= $this->autoSaveTicks){
    $this->autoSaveTicker = 0;

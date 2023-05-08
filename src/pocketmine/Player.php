@@ -507,9 +507,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
   $this->server->onPlayerLogin($this);
   $this->spawnToAll();
   $this->level->getWeather()->sendWeather($this);
-  if($this->server->dserverConfig['enable'] and $this->server->dserverConfig['queryAutoUpdate']){
-   $this->server->updateQuery();
-  }
   if($this->getHealth() <= 0){
    $this->respawn();
   }
@@ -2802,7 +2799,6 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
     $this->perm = null;
    }
    $this->transactionQueue = null;
-   if($this->server->dserverConfig["enable"] and $this->server->dserverConfig["queryAutoUpdate"]) $this->server->updateQuery();
   }
  }
  public function __debugInfo() : array{
