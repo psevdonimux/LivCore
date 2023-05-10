@@ -442,7 +442,7 @@ class Server{
    }
   return null;
  }
- public function matchPlayer($partialName) : array{
+ public function matchPlayer(string $partialName) : array{
   $partialName = strtolower($partialName);
   $matchedPlayers = [];
    foreach($this->getOnlinePlayers() as $player){
@@ -482,7 +482,7 @@ class Server{
  public function getLevel(int $levelId) : ?Level{
   return $this->levels[$levelId] ?? null;
  }
- public function getLevelByName($name) : ?Level{
+ public function getLevelByName(string $name) : ?Level{
    foreach($this->getLevels() as $level){
   if($level->getFolderName() === $name){
    return $level;
@@ -539,7 +539,7 @@ class Server{
   $this->getPluginManager()->callEvent(new LevelLoadEvent($level));
   return true;
  }
- public function generateLevel(string $name, string $seed = null, $generator = null, array $options = []) : bool{
+ public function generateLevel(string $name, string $seed = null, mixed $generator = null, array $options = []) : bool{
   if(trim($name) === "" or $this->isLevelGenerated($name)){
    return false;
   }
@@ -818,8 +818,7 @@ class Server{
   }
   $this->dataPath = realpath($dataPath) . DIRECTORY_SEPARATOR;
   $this->pluginPath = realpath($pluginPath) . DIRECTORY_SEPARATOR;
-  $version = new VersionString($this->getPocketMineVersion());
-  $this->version = $version;
+  $this->version = new VersionString($this->getPocketMineVersion());
      if(!file_exists($this->dataPath . "pocketmine.yml")){
     if(file_exists($this->dataPath . "lang.txt")){
    $langFile = new Config($configPath = $this->dataPath . "lang.txt", Config::ENUM, []);

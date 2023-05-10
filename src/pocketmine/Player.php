@@ -45,12 +45,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  public const RESOURCE_PACK_CHUNK_SIZE = 131072; //128KB
 
  protected SourceInterface $interface;
- public bool $playedBefore = false, $spawned = false, $loggedIn = false;
+ public bool $playedBefore = false, $spawned = false, $loggedIn = false, $isSit = false;
  protected int $windowCnt = 2, $messageCounter = 2, $startAction = -1, $nextChunkOrderRun = 5, $viewDistance = -1, $spawnChunkLoadCount = 0, $inAirTicks = 0, $lastEnderPearlUse = 0, $port, $chunksPerTick, $spawnThreshold, $randomClientId, $protocol;
  protected array $windows = [], $windowIndex = [], $loadQueue = [], $hiddenPlayers = [], $personalCreativeItems = [];
  public array $achievements = [], $selectedPos = [], $selectedLev = [], $usedChunks = [], $weatherData = [0, 0, 0];
  public int $foodTick = 0, $starvationTick = 0, $foodUsageTime = 0, $gamemode, $craftingType = self::CRAFTING_SMALL;
- protected bool $connected = true, $removeFormat = false, $isTeleporting = false, $autoJump = true, $allowFlight = false, $flying = false, $allowMovementCheats = false, $shouldSendStatus = false, $moving = false, $isSit = false;
+ protected bool $connected = true, $removeFormat = false, $isTeleporting = false, $autoJump = true, $allowFlight = false, $flying = false, $allowMovementCheats = false, $shouldSendStatus = false, $moving = false;
  protected string $username, $iusername, $displayName, $languageCode = 'en_UK', $ip;
  protected ?Vector3 $sleeping = null;
  private ?int $loaderId = null;
@@ -514,6 +514,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
    $this->inventory->sendContents($this);
    $this->inventory->sendArmorContents($this);
    $this->offhandInventory->sendContents($this);
+  }
+  //исправление бага при котором при входе, игрок с виду который должен сидеть просто стоит
+  foreach($this->level->getPlayers() as $viewers){
+   if($viewers->isSit()){
+    $viewers->setSit(true, [$this]);
+   }
   }
  }
  protected function sendRespawnPacket(Vector3 $pos) : void{
@@ -3199,22 +3205,27 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
  public function isSit() : bool{
   return $this->isSit;
  }
- public function setSit(bool $value) : void{
-   $add = new AddEntityPacket;
-   $add->eid = 100;
-   $add->type = DroppedItem::NETWORK_ID;
-   $add->x = $this->getX();
-   $add->y = $this->getY() + 0.9;
-   $add->z = $this->getZ();
-   $add->metadata = [
-   Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, 1 << Entity::DATA_FLAG_IMMOBILE]
-   ];
-   $this->server->broadcastPacket($this->level->getPlayers(), $add);
-   $link = new SetEntityLinkPacket;
-   $link->from = 100;
-   $link->to = $this->getId();
-   $link->type = $value ? 1 : 0;
-   $this->isSit = $value ? true : false;
-   $this->server->broadcastPacket($this->level->getPlayers(), $link);
+ public function setSit(bool $value, ?array $viewers = null) : void{  
+  $add = new AddEntityPacket;
+  $add->eid = $this->getLoaderId() + 1000;
+  $add->type = DroppedItem::NETWORK_ID;
+  $add->x = $this->getX();
+  $y = $this->getY() + 1.5;
+  if($viewers === null){
+   $viewers = $this->level->getPlayers();
+   $y = $this->getY() + 0.9;
+  }
+  $add->y = $y;
+  $add->z = $this->getZ();
+  $add->metadata = [
+  Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, 1 << Entity::DATA_FLAG_IMMOBILE]
+  ];
+  $link = new SetEntityLinkPacket;
+  $link->from = $add->eid;
+  $link->to = $this->getId();
+  $link->type = $value ? 1 : 0;
+  $this->isSit = $value ? true : false;
+  $this->server->broadcastPacket($viewers, $add);
+  $this->server->broadcastPacket($viewers, $link);
  }
 }
