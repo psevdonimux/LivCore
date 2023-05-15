@@ -31,6 +31,7 @@ use pocketmine\scheduler\SendMapTask;
 use pocketmine\tile\{ItemFrame, Spawnable};
 use pocketmine\utils\{TextFormat, UUID};
 use pocketmine\event\entity\EntityItemPickupEvent;
+use pocketmine\player\PlayerInfo;
 
 class Player extends Human implements CommandSender, InventoryHolder, ChunkLoader, IPlayer{
 
@@ -64,6 +65,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  public ?FishingHook $fishingHook = null;
  public float $creationTime = 0.0;
  protected mixed $deviceModel, $deviceOS, $xbox, $newPosition = null;
+ public PlayerInfo $playerInfo;
 
  public function getDeviceModel() : mixed{
   return $this->deviceModel;
@@ -358,7 +360,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
  public function getPort() : int{
   return $this->port;
  }
- public function getNextPosition(){
+ public function getNextPosition() : Position{
   return $this->newPosition !== null ? new Position($this->newPosition->x, $this->newPosition->y, $this->newPosition->z, $this->level) : $this->getPosition();
  }
  public function isSleeping() : bool{
@@ -1403,6 +1405,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
     $pk = new PlayStatusPacket();
     $pk->status = PlayStatusPacket::LOGIN_SUCCESS;
     $this->dataPacket($pk);
+    $this->playerInfo = new PlayerInfo($packet);
     $this->username = TextFormat::clean($packet->username);
     $this->displayName = $this->username;
     $this->setNameTag($this->username);
@@ -1505,7 +1508,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
     if($this->linkedEntity instanceof Entity){
      $entity = $this->linkedEntity;
      if($entity instanceof Boat){
-      $entity->setPosition($this->temporalVector->setComponents($packet->x, $packet->y - 0.3, $packet->z));
+      $entity->setPosition($this->temporalVector->setComponents($packet->x, $packet->y - 1, $packet->z));
      }
     }
     $newPos = new Vector3($packet->x, $packet->y - $this->baseOffset, $packet->z);
@@ -3227,5 +3230,8 @@ if(in_array($packet->action, [InteractPacket::ACTION_RIGHT_CLICK, InteractPacket
   $this->isSit = $value ? true : false;
   $this->server->broadcastPacket($viewers, $add);
   $this->server->broadcastPacket($viewers, $link);
+ }
+ public function getPlayerInfo() : PlayerInfo{
+  return $this->playerInfo;
  }
 }
