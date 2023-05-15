@@ -121,17 +121,10 @@ class Boat extends Vehicle {
 
 		$hasUpdate = $this->entityBaseTick($tickDiff);
 
-		if(!$this->level->getBlock(new Vector3($this->x, $this->y, $this->z))->getBoundingBox() == null or $this->isInsideOfWater()){
-			$this->motionY = 0.1;
-		}else{
-			$this->motionY = -0.08;
-		}
-
-		$this->move($this->motionX, $this->motionY, $this->motionZ);
+		         $this->move($this->motionX, $this->motionY, $this->motionZ);
 		$this->updateMovement();
-
 		if($this->linkedEntity == null or $this->linkedType = 0){
-			if($this->age > 1500){
+      if($this->age > 1500){
 				$this->close();
 				$hasUpdate = true;
 				//$this->scheduleUpdate();
@@ -140,7 +133,6 @@ class Boat extends Vehicle {
 			}
 			$this->age++;
 		}else $this->age = 0;
-
 		$this->timings->stopTiming();
 
 
