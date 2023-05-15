@@ -539,7 +539,7 @@ class Server{
   $this->getPluginManager()->callEvent(new LevelLoadEvent($level));
   return true;
  }
- public function generateLevel(string $name, string $seed = null, mixed $generator = null, array $options = []) : bool{
+ public function generateLevel(string $name, ?int $seed = null, mixed $generator = null, array $options = []) : bool{
   if(trim($name) === "" or $this->isLevelGenerated($name)){
    return false;
   }
