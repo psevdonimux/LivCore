@@ -69,7 +69,7 @@ if($target instanceof Water){
 		$boat = new BoatEntity($player->getLevel(), new CompoundTag("", [
 			"Pos" => new ListTag("Pos", [
 				new DoubleTag("", $realPos->getX() + 0.5),
-				new DoubleTag("", $realPos->getY()),
+				new DoubleTag("", $realPos->getY() - 1.4),
 				new DoubleTag("", $realPos->getZ() + 0.5)
 			]),
 			"Motion" => new ListTag("Motion", [
