@@ -522,6 +522,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
    if($viewers->isSit()){
     $viewers->setSit(true, [$this]);
    }
+   $viewers->sendLinkedData(); //тоже самое с лодкой
   }
  }
  protected function sendRespawnPacket(Vector3 $pos) : void{
