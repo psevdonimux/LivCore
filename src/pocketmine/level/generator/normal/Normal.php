@@ -48,10 +48,10 @@ class Normal extends Generator{
 	public function getWaterHeight() : int{
 		return $this->waterHeight;
 	}
-    public function getSettings(){
+    public function getSettings() : array{
      return [];
     }
-	public function pickBiome($x, $z){
+	public function pickBiome($x, $z) : Biome{
 		$hash = $x * 2345803 ^ $z * 9236449 ^ $this->level->getSeed();
 		$hash *= $hash + 223;
 		$xNoise = $hash >> 20 & 3;
@@ -64,7 +64,7 @@ class Normal extends Generator{
 		}
 		return $this->selector->pickBiome($x + $xNoise - 1, $z + $zNoise - 1);
 	}
-	public function init(ChunkManager $level, Random $random){
+	public function init(ChunkManager $level, Random $random) : void{
 		$this->level = $level;
 		$this->random = $random;
 		$this->random->setSeed($this->level->getSeed());
@@ -126,7 +126,7 @@ class Normal extends Generator{
 		$ores = new Ore();
 		$ores->setOreTypes([
 			new OreType(new CoalOre(), 20, 16, 0, 128),
-			new OreType(New IronOre(), 20, 8, 0, 64),
+			new OreType(new IronOre(), 20, 8, 0, 64),
 			new OreType(new RedstoneOre(), 8, 7, 0, 16),
 			new OreType(new LapisOre(), 1, 6, 0, 32),
 			new OreType(new GoldOre(), 2, 8, 0, 32),
