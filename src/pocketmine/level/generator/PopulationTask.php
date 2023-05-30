@@ -18,7 +18,7 @@ class PopulationTask extends AsyncTask{
   $this->levelId = $level->getId();
   $this->chunk = $chunk->fastSerialize();
  }
- public function onRun(){
+ public function onRun() : void{
   $manager = $this->getFromThreadStore('generation.level'. $this->levelId. '.manager');
   $generator = $this->getFromThreadStore('generation.level'. $this->levelId. '.generator');
   if(!($manager instanceof SimpleChunkManager) or !($generator instanceof Generator)){
@@ -37,12 +37,11 @@ class PopulationTask extends AsyncTask{
   $generator->populateChunk($chunk->getX(), $chunk->getZ());
   $chunk->setPopulated();
   $chunk->recalculateHeightMap();
-  $chunk->populateSkyLight();
   $chunk->setLightPopulated();
   $this->chunk = $chunk->fastSerialize();
   $manager->cleanChunks();
  }
- public function onCompletion(Server $server){
+ public function onCompletion(Server $server) : void{
   $level = $server->getLevel($this->levelId);
    if($level !== null){
   if(!$this->state){
